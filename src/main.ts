@@ -1,24 +1,66 @@
 import './style.css'
-import typescriptLogo from './typescript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.ts'
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
-  </div>
-`
+function renderApp(): void {
+  const app = document.querySelector<HTMLDivElement>('#app')
+  if (!app) return
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+  app.innerHTML = `
+    <header class="header">
+      <h1>さいたまIT・WEB専門学校までのルート</h1>
+    </header>
+
+    <main class="main-content">
+      <div class="map-container">
+        <button class="guidance-button">
+          <div class="icon-circle">
+            <i class="fa-solid fa-location-dot"></i>
+          </div>
+          <div class="text-box">
+            <span class="main-text">リアルタイム案内</span>
+            <span class="sub-text">を開始する</span>
+          </div>
+        </button>
+      </div>
+
+      <div class="next-location-bar">
+        <div class="location-info">
+          <p class="label">次に近い場所</p>
+          <p class="dots">○○○○○○○○○○○○○○○○。</p>
+        </div>
+        <div class="refresh-icon">
+          <i class="fa-solid fa-rotate"></i>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <div class="info-row">
+          <h2>利用可能時間</h2>
+          <p class="time-text">朝9:00〜夜21:00</p>
+        </div>
+        <hr class="divider">
+        <div class="info-row">
+          <h2>補足</h2>
+          <div class="supplement-text">
+            <span>・月〜金使用可能</span>
+            <span>・祝日使用不可</span><br>
+            <span>・毎週土日使用不可</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer-actions">
+      <button class="action-btn">
+        <i class="fa-solid fa-phone-volume"></i>
+        <span>救急連絡</span>
+      </button>
+      <button class="action-btn">
+        <i class="fa-solid fa-kit-medical"></i>
+        <span>応急処置</span>
+      </button>
+    </footer>
+  `
+}
+
+// アプリケーション起動
+renderApp()

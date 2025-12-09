@@ -1,96 +1,197 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@charset "UTF-8";
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* 基本設定*/
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+html {
+    height: 100%;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+    font-family: "BIZ UDGothic", "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    background-color: #fff;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/*ヘッダー*/
+.header {
+    background-color: #3DA73D;
+    color: white;
+    padding-top: 50px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    text-align: center;
 }
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+.header h1 {
+    font-size: 18px;
+    font-weight: normal;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vanilla:hover {
-  filter: drop-shadow(0 0 2em #3178c6aa);
-}
-
-.card {
-  padding: 2em;
+/*地図の部分*/
+.map-container {
+    position: relative;
+    width: 100%;
+    height: 60vh; 
+    min-height: 400px;
+    
+    background-image: url('/map.png');
+    background-size: cover;
+    background-position: center;
+    background-color: #e0e0e0;
 }
 
-.read-the-docs {
-  color: #888;
+/*リアルタイム案内ボタン*/
+.guidance-button {
+    position: absolute;
+    top: 20px;
+    right: 15px;
+    background-color: #126A12;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    cursor: pointer;
+    z-index: 10;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.guidance-button .icon-circle {
+    font-size: 24px;
+    color: #4285F4;
+    background: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.guidance-button .text-box {
+    text-align: left;
+    line-height: 1.2;
+}
+
+/*地図上の吹き出しの文字*/
+.guidance-button .main-text {
+    display: block;
+    font-size: 14px;
+    font-weight: normal;
+    text-decoration: underline;
+}
+
+.guidance-button .sub-text {
+    font-size: 12px;
+    text-decoration: underline;
+}
+
+/*次に近い場所バー*/
+.next-location-bar {
+    background-color: #126A12;
+    color: white;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.location-info .label {
+    font-size: 12px;
+    opacity: 0.9;
+    margin-bottom: 2px;
+}
+
+.location-info .dots {
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+.refresh-icon {
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/*AEDの情報部分*/
+.info-section {
+    padding: 20px;
+    background-color: white;
+    padding-bottom: 20px; 
+}
+
+.info-row {
+    margin-bottom: 10px;
+}
+
+.info-row h2 {
+    font-size: 14px;
+    font-weight: normal;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.time-text {
+    font-size: 22px;
+    font-weight: bold;
+    color: #000;
+}
+
+.supplement-text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #000;
+}
+
+.divider {
+    border: none;
+    border-top: 1px solid #ccc;
+    margin: 15px 0;
+}
+
+/*フッター*/
+.footer-actions {
+    display: flex;
+    width: 100%;
+    height: 80px;
+    margin-top: auto;
+}
+
+.action-btn {
+    flex: 1;
+    background-color: #3DA73D;
+    color: white;
+    border: none;
+    border-right: 1px solid #388E3C;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.action-btn:last-child {
+    border-right: none;
+}
+
+.action-btn i {
+    font-size: 32px;
 }
