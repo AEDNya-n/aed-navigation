@@ -162,6 +162,11 @@ export function isAvailable(facility: AEDFacility, currentDate: Date = new Date(
     return false;
   }
 
+  // 祝日利用不可チェック
+  if (isHoliday && !facility.holidayAvailable && !isAcceptableHoliday(currentDate, facility.acceptableHolidays)) {
+    return false;
+  }
+
   // 祝日利用可否チェック
   if (isHoliday) {
     if (isInvalidHoliday(currentDate, facility.invalidHolidays)) {
@@ -200,10 +205,6 @@ export function isAvailable(facility: AEDFacility, currentDate: Date = new Date(
   let endTime: string;
   
   if (isHoliday) {
-    // 祝日の場合
-    if (!facility.holidayAvailable) {
-      return false;
-    }
     startTime = facility.holidayAvailableStartTime;
     endTime = facility.holidayAvailableEndTime;
     // 祝日の営業時間が設定されていない場合は曜日の営業時間を使用
