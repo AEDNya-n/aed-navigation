@@ -6,35 +6,63 @@ import { filterAvailableFacilities, type AEDFacility } from "./filter.ts";
  */
 function displayFacilities(facilities: AEDFacility[], container: HTMLElement) {
   container.innerHTML = "";
-  
+
   if (facilities.length === 0) {
-    container.innerHTML = "<p>現在利用可能な施設はありません。</p>";
+    const message = document.createElement("p");
+    message.textContent = "現在利用可能な施設はありません。";
+    container.appendChild(message);
     return;
   }
-  
+
   const list = document.createElement("ul");
   list.className = "facility-list";
-  
+
   facilities.forEach((facility) => {
     const item = document.createElement("li");
     item.className = "facility-item";
-    
-    item.innerHTML = `
-      <div class="facility-header">
-        <h3>${facility.locationName}</h3>
-        <span class="organization">${facility.organizationName}</span>
-      </div>
-      <div class="facility-details">
-        <p class="address">${facility.locationAddress}</p>
-        <p class="coordinates">緯度: ${facility.latitude}, 経度: ${facility.longitude}</p>
-        <p class="available-days">${facility.availableDays}</p>
-        ${facility.notes ? `<p class="notes">${facility.notes}</p>` : ""}
-      </div>
-    `;
-    
+
+    const header = document.createElement("div");
+    header.className = "facility-header";
+
+    const title = document.createElement("h3");
+    title.textContent = facility.locationName;
+    header.appendChild(title);
+
+    const organization = document.createElement("span");
+    organization.className = "organization";
+    organization.textContent = facility.organizationName;
+    header.appendChild(organization);
+
+    const details = document.createElement("div");
+    details.className = "facility-details";
+
+    const address = document.createElement("p");
+    address.className = "address";
+    address.textContent = facility.locationAddress;
+    details.appendChild(address);
+
+    const coordinates = document.createElement("p");
+    coordinates.className = "coordinates";
+    coordinates.textContent = `緯度: ${facility.latitude}, 経度: ${facility.longitude}`;
+    details.appendChild(coordinates);
+
+    const availableDays = document.createElement("p");
+    availableDays.className = "available-days";
+    availableDays.textContent = facility.availableDays;
+    details.appendChild(availableDays);
+
+    if (facility.notes) {
+      const notes = document.createElement("p");
+      notes.className = "notes";
+      notes.textContent = facility.notes;
+      details.appendChild(notes);
+    }
+
+    item.appendChild(header);
+    item.appendChild(details);
+
     list.appendChild(item);
   });
-  
   container.appendChild(list);
 }
 
