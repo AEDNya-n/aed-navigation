@@ -127,11 +127,11 @@ function isPreviousDayHoliday(date: Date): boolean {
 function isWithinOperatingHours(currentMinutes: number, startMinutes: number, endMinutes: number): boolean {
   if (startMinutes <= endMinutes) {
     // 通常の営業時間 (例: 09:00 - 21:00)
-    console.log("通常営業時間");
+    // console.log("通常営業時間");
     return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
   } else {
     // 24時間を超える営業時間 (例: 20:00 - 02:00)
-    console.log("24時間超営業時間");
+    // console.log("24時間超営業時間");
     return currentMinutes >= startMinutes || currentMinutes <= endMinutes;
   }
 }

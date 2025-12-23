@@ -115,7 +115,7 @@ export async function initFilterApp() {
     
     // CSVデータをロード
     loadingElement.style.display = "block";
-    const facilities = await loadAEDDataFromCSV("/aed-navigation/aed_data.csv");
+    const facilities = await loadAEDDataFromCSV(`${import.meta.env.BASE_URL}/aed_data.csv`);
     loadingElement.style.display = "none";
     
     // 初回フィルタリング

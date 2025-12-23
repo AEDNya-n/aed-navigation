@@ -1,7 +1,15 @@
 import './style.css'
+import { loadAEDDataFromCSV } from './csvLoader';
+import { filterAvailableFacilities } from './filter';
+import type { AEDFacility } from './filter';
 
 function renderApp(): void {
   const app = document.querySelector<HTMLDivElement>('#app')
+  const facilitiesPromise = loadAndFilterFacilities();
+    facilitiesPromise.then(facilities => {
+      console.log(`利用可能な施設の件数: ${facilities.length}`);
+    });
+
   if (!app) return
 
   app.innerHTML = `
@@ -62,5 +70,12 @@ function renderApp(): void {
   `
 }
 
+async function loadAndFilterFacilities(): Promise<AEDFacility[]> {
+  const facilities = await loadAEDDataFromCSV(`${import.meta.env.BASE_URL}/aed_data.csv`);
+  const currentDate = new Date();
+  const availableFacilities = filterAvailableFacilities(facilities, currentDate);
+  return availableFacilities;
+}
+
 // アプリケーション起動
-renderApp()
+renderApp();
