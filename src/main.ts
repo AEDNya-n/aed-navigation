@@ -3,6 +3,11 @@ import { loadAEDDataFromCSV } from './csvLoader';
 import { filterAvailableFacilities } from './filter';
 import type { AEDFacility } from './filter';
 
+import * as MapTools from "./mapTools.ts"
+import L from "leaflet";
+import "leaflet/dist/leaflet.css"
+import "./modules/leaflet.usermarker.css"
+
 function renderApp(): void {
   const app = document.querySelector<HTMLDivElement>('#app')
   const facilitiesPromise = loadAndFilterFacilities();
@@ -10,6 +15,8 @@ function renderApp(): void {
       console.log(`利用可能な施設の件数: ${facilities.length}`);
     });
 
+
+  MapTools.getNowLocation()
   if (!app) return
 
   app.innerHTML = `
