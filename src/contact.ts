@@ -7,7 +7,7 @@ export function renderContactPage(): void {
   // Content from contact.html
   app.innerHTML = `
         <header class="header contact-header">
-            <a href="#/" class="back-btn">
+            <a href="${import.meta.env.BASE_URL}" class="back-btn">
                 <i class="fa-solid fa-right-from-bracket"></i>
             </a>
             <h1>119番通報画面</h1>
