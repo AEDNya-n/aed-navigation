@@ -1,4 +1,4 @@
-import"./modulepreload-polyfill-B5Qt9EMX.js";function a(){const s=document.querySelector("#app");s&&(s.innerHTML=`
+import{l as t,f as n}from"./filter-CcjlylcP.js";function e(){const a=document.querySelector("#app");o().then(s=>{console.log(`利用可能な施設の件数: ${s.length}`)}),a&&(a.innerHTML=`
     <header class="header">
       <h1>さいたまIT・WEB専門学校までのルート</h1>
     </header>
@@ -53,4 +53,4 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";function a(){const s=document.query
         <span>応急処置</span>
       </button>
     </footer>
-  `)}a();
+  `)}async function o(){const a=await t("/aed-navigation/aed_data.csv");return n(a,new Date)}e();
