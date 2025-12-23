@@ -45,3 +45,5 @@ export function renderContactPage(): void {
         </footer>
   `;
 }
+
+renderContactPage();
