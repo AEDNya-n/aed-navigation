@@ -1,4 +1,4 @@
-(function(){const i=document.createElement("link").relList;if(i&&i.supports&&i.supports("modulepreload"))return;for(const e of document.querySelectorAll('link[rel="modulepreload"]'))n(e);new MutationObserver(e=>{for(const s of e)if(s.type==="childList")for(const o of s.addedNodes)o.tagName==="LINK"&&o.rel==="modulepreload"&&n(o)}).observe(document,{childList:!0,subtree:!0});function a(e){const s={};return e.integrity&&(s.integrity=e.integrity),e.referrerPolicy&&(s.referrerPolicy=e.referrerPolicy),e.crossOrigin==="use-credentials"?s.credentials="include":e.crossOrigin==="anonymous"?s.credentials="omit":s.credentials="same-origin",s}function n(e){if(e.ep)return;e.ep=!0;const s=a(e);fetch(e.href,s)}})();function r(){const t=document.querySelector("#app");t&&(t.innerHTML=`
+import"./modulepreload-polyfill-B5Qt9EMX.js";function a(){const s=document.querySelector("#app");s&&(s.innerHTML=`
     <header class="header">
       <h1>さいたまIT・WEB専門学校までのルート</h1>
     </header>
@@ -53,4 +53,4 @@
         <span>応急処置</span>
       </button>
     </footer>
-  `)}r();
+  `)}a();

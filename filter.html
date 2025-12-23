@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AED施設フィルター</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f5f5f5;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .info p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .info strong {
+            color: #333;
+        }
+
+        #loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .error {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #d32f2f;
+        }
+
+        .facility-list {
+            list-style: none;
+        }
+
+        .facility-item {
+            background: white;
+            margin-bottom: 15px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .facility-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .facility-header {
+            margin-bottom: 12px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 8px;
+        }
+
+        .facility-header h3 {
+            color: #1976d2;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .organization {
+            color: #666;
+            font-size: 14px;
+            font-weight: normal;
+        }
+
+        .facility-details p {
+            margin: 8px 0;
+            color: #444;
+        }
+
+        .address {
+            font-weight: 500;
+        }
+
+        .coordinates {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .available-days {
+            background: #e3f2fd;
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .notes {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff9c4;
+            border-left: 3px solid #fbc02d;
+            font-size: 14px;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .facility-item {
+                padding: 15px;
+            }
+
+            .facility-header h3 {
+                font-size: 18px;
+            }
+        }
+    </style>
+  <script type="module" crossorigin src="/aed-navigation/assets/filter-C8NflKIY.js"></script>
+  <link rel="modulepreload" crossorigin href="/aed-navigation/assets/modulepreload-polyfill-B5Qt9EMX.js">
+</head>
+<body>
+    <input type="date" id="input_date">
+    <input type="time" id="input_time">
+    <h1>🚑 利用可能なAED施設</h1>
+    
+    <div class="info">
+        <p><strong>利用可能施設数:</strong> <span id="count">-</span></p>
+    </div>
+
+    <div id="loading">データを読み込んでいます...</div>
+    <div id="result"></div>
+
+</body>
+</html>
