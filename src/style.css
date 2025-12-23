@@ -35,15 +35,18 @@ body {
     flex-direction: column;
     overflow-y: auto;
     overflow-x: hidden;
+    background-color: white;
 }
 
 /*ヘッダー*/
 .header {
     background-color: #3DA73D;
     color: white;
-    padding: 15px 10px 10px;
+    padding: 25px 10px 20px;
     text-align: center;
     flex-shrink: 0;
+    position: relative;
+    width: 100%;
 }
 
 .header h1 {
@@ -54,13 +57,31 @@ body {
     text-overflow: ellipsis;
 }
 
+/* 戻るボタン */
+.back-btn {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: black;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.back-btn i {
+    transform: scaleX(-1);
+    font-size: 28px;
+}
+
 /*地図の部分*/
 .map-container {
     position: relative;
     width: 100%;
     flex: 1;
     min-height: 0;
-    
     background-image: url('/map.png');
     background-size: cover;
     background-position: center;
@@ -176,6 +197,59 @@ body {
     border: none;
     border-top: 1px solid #ccc;
     margin: 15px 0;
+}
+
+/* 119番通報画面用 */
+.content-area {
+    padding: 30px 20px;
+    text-align: center;
+    background-color: white;
+}
+
+.emergency-call-btn {
+    background-color: #FF0000;
+    color: white;
+    width: 100%;
+    max-width: 320px;
+    border: none;
+    border-radius: 30px;
+    padding: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin: 0 auto 20px auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    cursor: pointer;
+}
+
+.emergency-call-btn i {
+    font-size: 32px;
+    transform: rotate(-15deg);
+}
+
+.instruction-text {
+    font-size: 14px;
+    color: #333;
+}
+
+.current-location-bar {
+    background-color: #1a5e1a;
+    color: white;
+    padding: 10px 15px;
+    width: 100%;
+}
+
+.location-label {
+    font-size: 12px;
+    margin-bottom: 2px;
+}
+
+.address-text {
+    font-size: 16px;
+    font-weight: bold;
 }
 
 /*フッター*/
