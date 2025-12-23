@@ -1,31 +1,37 @@
-import './style.css';
-import { renderContactPage } from './contact';
+import './style.css'
 
-const app = document.querySelector<HTMLDivElement>('#app');
+function renderApp(): void {
+  const app = document.querySelector<HTMLDivElement>('#app')
+  if (!app) return
 
-function renderHomePage() {
-  if (!app) return;
   app.innerHTML = `
     <header class="header">
       <h1>さいたまIT・WEB専門学校までのルート</h1>
     </header>
+
     <main class="main-content">
       <div class="map-container">
         <button class="guidance-button">
-          <div class="icon-circle"><i class="fa-solid fa-location-dot"></i></div>
+          <div class="icon-circle">
+            <i class="fa-solid fa-location-dot"></i>
+          </div>
           <div class="text-box">
             <span class="main-text">リアルタイム案内</span>
             <span class="sub-text">を開始する</span>
           </div>
         </button>
       </div>
+
       <div class="next-location-bar">
         <div class="location-info">
           <p class="label">次に近い場所</p>
           <p class="dots">○○○○○○○○○○○○○○○○。</p>
         </div>
-        <div class="refresh-icon"><i class="fa-solid fa-rotate"></i></div>
+        <div class="refresh-icon">
+          <i class="fa-solid fa-rotate"></i>
+        </div>
       </div>
+
       <div class="info-section">
         <div class="info-row">
           <h2>利用可能時間</h2>
@@ -42,8 +48,9 @@ function renderHomePage() {
         </div>
       </div>
     </main>
+
     <footer class="footer-actions">
-      <button id="emergency-contact-btn" class="action-btn">
+      <button class="action-btn">
         <i class="fa-solid fa-phone-volume"></i>
         <span>救急連絡</span>
       </button>
@@ -52,38 +59,8 @@ function renderHomePage() {
         <span>応急処置</span>
       </button>
     </footer>
-  `;
+  `
 }
 
-// --- ルーター機能 ---
-
-// パスと描画関数をマッピング
-const routes = {
-  '/': renderHomePage,
-  '/contact': renderContactPage,
-};
-
-// 現在のURLハッシュに基づいてページを切り替える
-function navigate() {
-  const path = window.location.hash.slice(1) || '/';
-  const render = routes[path] || routes['/']; // 見つからない場合はホームページへ
-  
-  // ページを描画
-  render();
-
-  // ホームページの場合のみ、電話アイコンにクリックイベントを設定
-  if (path === '/') {
-    const emergencyButton = document.getElementById('emergency-contact-btn');
-    if (emergencyButton) {
-      emergencyButton.onclick = () => {
-        window.location.hash = '/contact';
-      };
-    }
-  }
-}
-
-// --- イベントリスナーの初期設定 ---
-
-// ページ読み込み時とハッシュ変更時に`navigate`関数を実行
-window.addEventListener('load', navigate);
-window.addEventListener('hashchange', navigate);
+// アプリケーション起動
+renderApp()
