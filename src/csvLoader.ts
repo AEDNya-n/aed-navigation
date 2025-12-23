@@ -8,10 +8,10 @@ export async function loadAEDDataFromCSV(csvUrl: string): Promise<AEDFacility[]>
   const csvText = await response.text();
   
   const lines = csvText.trim().split("\n");
-  // Skip header row
   
   const facilities: AEDFacility[] = [];
   
+  // Skip header row
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i];
     if (!line.trim()) continue;
