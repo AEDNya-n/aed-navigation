@@ -82,7 +82,7 @@ body {
     width: 100%;
     flex: 1;
     min-height: 0;
-    background-image: url('/map.png');
+    /* background-image: url('/map.png'); */
     background-size: cover;
     background-position: center;
     background-color: #e0e0e0;

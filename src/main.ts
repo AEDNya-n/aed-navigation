@@ -4,9 +4,7 @@ import { filterAvailableFacilities } from './filter';
 import type { AEDFacility } from './filter';
 
 import * as MapTools from "./mapTools.ts"
-import L from "leaflet";
 import "leaflet/dist/leaflet.css"
-import "./modules/leaflet.usermarker.css"
 
 function renderApp(): void {
   const app = document.querySelector<HTMLDivElement>('#app')
@@ -16,7 +14,7 @@ function renderApp(): void {
     });
 
 
-  MapTools.getNowLocation()
+  const nowLocation = MapTools.getNowLocation()
   if (!app) return
 
   app.innerHTML = `
@@ -75,6 +73,9 @@ function renderApp(): void {
       </button>
     </footer>
   `
+  if (!nowLocation) return
+
+  MapTools.initMapView(nowLocation)
 }
 
 async function loadAndFilterFacilities(): Promise<AEDFacility[]> {
