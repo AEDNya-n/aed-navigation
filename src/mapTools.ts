@@ -1,8 +1,15 @@
 import "leaflet.locatecontrol"
 import L from "leaflet";
 
-export function initMapView(nowLocation: number[]){
-  var map = L.map("map-container").setView(nowLocation[0], nowLocation[1])
+export interface NowLocation {
+  latitude: number;
+  longitude: number;
+}
+
+export function initMapView(nowLocation: NowLocation){
+  console.log("initMapView")
+  console.log(nowLocation.latitude)
+  var map = L.map("map").setView([nowLocation.latitude, nowLocation.longitude], 18)
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -20,26 +27,27 @@ function calculateDistance() {
 
 }
 
-export function getNowLocation(): number[] | undefined {
-
-  async function success(position) {
-    const latitude = position.coords.latitude;
-    const longitude = position.coords.longitude;
-
-    console.info(`lat: ${latitude}°、log: ${longitude}°`);
-    return [latitude, longitude]
-  }
-
-  function error() {
-    console.error("Unable to retrieve your location");
-    return undefined
-  }
-
-  if (!navigator.geolocation) {
-    console.error("このブラウザーは位置情報に対応していません");
-    return undefined
-  } else {
-    console.info("位置情報を取得中…");
-    navigator.geolocation.getCurrentPosition(success, error);
-  }
+export async function getNowLocation(): Promise<NowLocation>{
+  return new Promise((resolve, reject) => {
+  
+    async function success(position) {
+      resolve({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      })
+    }
+  
+    function error() {
+      reject(new Error("Unable to retrieve your location"))
+      return
+    }
+  
+    if (!navigator.geolocation) {
+      reject(new Error("このブラウザーは位置情報に対応していません"))
+      return
+    } else {
+      console.info("位置情報を取得中…");
+      navigator.geolocation.getCurrentPosition(success, error);
+    }
+  })
 }
