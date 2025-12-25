@@ -1,5 +1,6 @@
-import "leaflet.locatecontrol"
-import L from "leaflet";
+import { LocateControl } from "leaflet.locatecontrol";
+import "./libs/leaflet.usermarker.js"
+import L from "leaflet"
 
 export interface NowLocation {
   latitude: number;
@@ -15,7 +16,16 @@ export function initMapView(nowLocation: NowLocation){
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(map)
   
-  L.control.locate().addTo(map);
+  
+
+  new LocateControl().addTo(map);
+  
+  const markerOptions = {
+    plusing: true,
+    smallIcon: true,
+  }
+  L.userMarker([nowLocation.latitude, nowLocation.longitude], markerOptions).addTo(map)
+
 
 }
 

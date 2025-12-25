@@ -4,8 +4,8 @@ import { filterAvailableFacilities } from './filter';
 import type { AEDFacility } from './filter';
 
 import * as MapTools from "./mapTools.ts"
+import "./libs/leaflet.usermarker.css"
 import "leaflet/dist/leaflet.css"
-import { map } from 'leaflet';
 
 function renderApp(): void {
   const app = document.querySelector<HTMLDivElement>('#app')
