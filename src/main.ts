@@ -7,12 +7,10 @@ import * as MapTools from "./mapTools.ts"
 import "./libs/leaflet.usermarker.css"
 import "leaflet/dist/leaflet.css"
 
-function renderApp(): void {
+async function renderApp(): Promise<void> {
   const app = document.querySelector<HTMLDivElement>('#app')
-  const facilitiesPromise = loadAndFilterFacilities();
-    facilitiesPromise.then(facilities => {
-      console.log(`利用可能な施設の件数: ${facilities.length}`);
-    });
+  const facilities = await loadAndFilterFacilities();
+  console.log(`利用可能な施設の件数: ${facilities.length}`);
 
   
  
@@ -74,17 +72,7 @@ function renderApp(): void {
       </button>
     </footer>
   `
-
-  let nowLocation: MapTools.NowLocation
-  const nowLocationPromise = MapTools.getNowLocation()
-  nowLocationPromise.then(nowLocationData => {
-    console.log(nowLocationData)
-    nowLocation = nowLocationData
-    MapTools.initMapView(nowLocation)
-  })
-
-
-
+  await MapTools.setup(facilities)
 }
 
 async function mapLoad(nowLocation: MapTools.NowLocation) {
