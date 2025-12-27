@@ -2,6 +2,7 @@ import * as holiday_jp from '@holiday-jp/holiday_jp';
 
 // AED施設データの型定義
 export interface AEDFacility {
+  id: number;
   organizationCode: string;
   organizationName: string;
   locationName: string;
