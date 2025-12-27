@@ -43,7 +43,7 @@ function initMapView(nowLocation: NowLocation){
   return map
 }
 
-function renderRoute(map, route) {
+function renderRoute(map: L.Map, route: L.LatLngExpression[]) {
       L.polyline(route, {
         color: 'blue',
         weight: 5,
