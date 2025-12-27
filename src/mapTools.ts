@@ -44,14 +44,15 @@ function initMapView(nowLocation: NowLocation){
 }
 
 function renderRoute(map: L.Map, route: L.LatLngExpression[]) {
-      L.polyline(route, {
+      const polyline = L.polyline(route, {
         color: 'blue',
         weight: 5,
         opacity: 0.5,
       }).addTo(map)
       
       const bounds = L.latLngBounds(route)
-      map.setView(bounds.getCenter(), 18)
+      map.setView(bounds.getCenter())
+      map.fitBounds(polyline.getBounds())
       console.log(map)
 }
 
