@@ -46,7 +46,7 @@ export async function setup(
   });
 }
 
-function initMapView(nowLocation: NowLocation){
+function initMapView(nowLocation: NowLocation): L.Map {
   console.log("initMapView")
   console.log(nowLocation.latitude)
   const map = L.map("map").setView([nowLocation.latitude, nowLocation.longitude], 18)
