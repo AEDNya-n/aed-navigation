@@ -3,6 +3,15 @@ import "./libs/leaflet.usermarker.js"
 import L from "leaflet"
 import type { AEDFacility } from "./filter.js";
 
+declare global {
+  namespace L {
+    function userMarker(
+      latlng: L.LatLngExpression,
+      options?: Record<string, unknown>
+    ): L.Marker;
+  }
+}
+
 export interface NowLocation {
   latitude: number;
   longitude: number;
@@ -136,7 +145,7 @@ async function getRoute(
     
     if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
       const route = data.routes[0]
-      const routeCoord = route.geometry.coordinates.map(coords => L.latLng(coords[1],coords[0]))
+      const routeCoord = route.geometry.coordinates.map((coords: [number, number]) => L.latLng(coords[1],coords[0]))
       return routeCoord
     }
   } catch (error) {
@@ -165,7 +174,7 @@ function getEuclidRange(nowLocation: NowLocation, destination: AEDFacility): num
 export async function getNowLocation(): Promise<NowLocation>{
   return new Promise((resolve, reject) => {
   
-    async function success(position) {
+    async function success(position: GeolocationPosition) {
       resolve({
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
