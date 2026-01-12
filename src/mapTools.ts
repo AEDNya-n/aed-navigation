@@ -98,12 +98,20 @@ function renderDestinationPin(map: L.Map, destination: AEDFacility) {
     icon,
   }).addTo(map);
 
-  marker.bindPopup(`
-    <div class="destination-popup">
-      <strong>${destination.locationName}</strong><br />
-      <span>${destination.locationAddress ?? ''}</span>
-    </div>
-  `);
+  const popupContent = document.createElement("div");
+  popupContent.className = "destination-popup";
+
+  const nameElement = document.createElement("strong");
+  nameElement.textContent = destination.locationName ?? "";
+  popupContent.appendChild(nameElement);
+
+  popupContent.appendChild(document.createElement("br"));
+
+  const addressElement = document.createElement("span");
+  addressElement.textContent = destination.locationAddress ?? "";
+  popupContent.appendChild(addressElement);
+
+  marker.bindPopup(popupContent);
 }
 
 async function getRoute(
