@@ -118,6 +118,12 @@ async function getRoute(
   const url = `${baseUrl}${coord}?${parameter}`
   try {
     const response = await fetch(url)
+    if (!response.ok) {
+      console.error(
+        `Error fetching route data: HTTP ${response.status} ${response.statusText} for URL ${url}`
+      );
+      return;
+    }
     const data = await response.json()
     
     if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
