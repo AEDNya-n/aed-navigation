@@ -3,13 +3,17 @@ import { loadAEDDataFromCSV } from './csvLoader';
 import { filterAvailableFacilities } from './filter';
 import type { AEDFacility } from './filter';
 
-function renderApp(): void {
-  const app = document.querySelector<HTMLDivElement>('#app')
-  const facilitiesPromise = loadAndFilterFacilities();
-    facilitiesPromise.then(facilities => {
-      console.log(`利用可能な施設の件数: ${facilities.length}`);
-    });
+import * as MapTools from "./mapTools.ts"
+import "./libs/leaflet.usermarker.css"
+import "leaflet/dist/leaflet.css"
 
+async function renderApp(): Promise<void> {
+  const app = document.querySelector<HTMLDivElement>('#app')
+  const facilities = await loadAndFilterFacilities();
+  console.log(`利用可能な施設の件数: ${facilities.length}`);
+
+  
+ 
   if (!app) return
 
   app.innerHTML = `
@@ -18,7 +22,7 @@ function renderApp(): void {
     </header>
 
     <main class="main-content">
-      <div class="map-container">
+      <div class="map-container" id="map">
         <button class="guidance-button">
           <div class="icon-circle">
             <i class="fa-solid fa-location-dot"></i>
@@ -68,7 +72,18 @@ function renderApp(): void {
       </button>
     </footer>
   `
+  await MapTools.setup(facilities)
 }
+
+async function mapLoad(nowLocation: MapTools.NowLocation) {
+  console.log("mapload")
+  while (!document.getElementById("map-container")) {
+    console.log("sleep")
+    await new Promise(f => setTimeout(f, 1000))
+  }
+  mapLoad(nowLocation)
+}
+
 
 async function loadAndFilterFacilities(): Promise<AEDFacility[]> {
   const facilities = await loadAEDDataFromCSV(`${import.meta.env.BASE_URL}/aed_data.csv`);
