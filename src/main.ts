@@ -115,4 +115,22 @@ function updateNextLocationName(sortedFacilities: MapTools.FacilityDistance[]): 
 }
 
 // アプリケーション起動
-renderApp();
+renderApp().catch(error => {
+  console.error("アプリケーション起動エラー:", error);
+  const app = document.querySelector<HTMLDivElement>('#app');
+  if (app) {
+    app.innerHTML = `
+      <div style="display: flex; align-items: center; justify-content: center; height: 100vh; flex-direction: column; gap: 20px; padding: 20px; text-align: center; background: white;">
+        <i class="fa-solid fa-exclamation-triangle" style="font-size: 48px; color: #d32f2f;"></i>
+        <div>
+          <p style="font-weight: bold; font-size: 18px; margin-bottom: 8px;">アプリケーション起動エラー</p>
+          <p style="font-size: 14px; color: #666; margin-bottom: 8px;">
+            ${error instanceof Error ? error.message : 'システムエラーが発生しました'}
+          </p>
+          <p style="font-size: 12px; color: #999;">ブラウザをリロードしてください</p>
+        </div>
+      </div>
+    `;
+  }
+});
+
