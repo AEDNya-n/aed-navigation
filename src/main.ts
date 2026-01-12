@@ -106,12 +106,6 @@ function updateNearestFacilityDetails(facility: AEDFacility): void {
   }
 }
 
-function formatCoordinates(facility: AEDFacility): string {
-  const latitude = Number.isFinite(facility.latitude) ? facility.latitude.toFixed(5) : "-"
-  const longitude = Number.isFinite(facility.longitude) ? facility.longitude.toFixed(5) : "-"
-  return `緯度 ${latitude} / 経度 ${longitude}`
-}
-
 function updateNextLocationName(sortedFacilities: MapTools.FacilityDistance[]): void {
   const nameEl = document.getElementById("next-location-name")
   if (!nameEl) return
