@@ -107,7 +107,10 @@ function renderDestinationPin(map: L.Map, destination: AEDFacility) {
   `);
 }
 
-async function getRoute(nowLocation: NowLocation, destination: AEDFacility) {
+async function getRoute(
+  nowLocation: NowLocation,
+  destination: AEDFacility
+): Promise<L.LatLngExpression[] | undefined> {
   console.log('getRoute called')
   const baseUrl = 'https://router.project-osrm.org/route/v1/foot/'
   const coord = `${nowLocation.longitude},${nowLocation.latitude};${destination.longitude},${destination.latitude}`
