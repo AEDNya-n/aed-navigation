@@ -18,6 +18,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    height: 100dvh;
     width: 100%;
     overflow: hidden;
 }
@@ -26,6 +27,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
 }
 
@@ -43,6 +45,9 @@ body {
     background: linear-gradient(135deg, #2b8a2b, #3DA73D);
     color: white;
     padding: 20px 18px 18px;
+    padding-top: max(20px, env(safe-area-inset-top));
+    padding-left: max(18px, env(safe-area-inset-left));
+    padding-right: max(18px, env(safe-area-inset-right));
     text-align: left;
     flex-shrink: 0;
     position: relative;
@@ -314,8 +319,11 @@ body {
 .footer-actions {
     display: flex;
     width: 100%;
-    height: 70px;
+    height: auto;
+    min-height: 70px;
     flex-shrink: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    background-color: #3DA73D; /* 背景色を追加してセーフエリアも同じ色にする */
 }
 
 .action-btn {
@@ -332,6 +340,7 @@ body {
     align-items: center;
     gap: 8px;
     cursor: pointer;
+    padding: 10px 0; /* 上下のパディングを追加 */
 }
 
 .action-btn:last-child {
