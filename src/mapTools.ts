@@ -165,7 +165,6 @@ export async function getNowLocation(): Promise<NowLocation>{
   
     if (!navigator.geolocation) {
       reject(new Error("このブラウザーは位置情報に対応していません"))
-      return
     } else {
       console.info("位置情報を取得中…");
       navigator.geolocation.getCurrentPosition(success, error);
