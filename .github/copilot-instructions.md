@@ -1,47 +1,39 @@
 # Copilot Instructions for `aed-navigation`
- 
-**ミッション/範囲**
-- Vite + TypeScript のクライアントで近隣の AED 施設を案内する Web アプリ。
-- ビューは2つ: ルート UI（[index.html](index.html)→[src/main.ts](src/main.ts)）とフィルタ UI（[filter.html](filter.html)→[src/filterApp.ts](src/filterApp.ts)）。
-- 全体設計は [docs/sequence.md](docs/sequence.md)。
 
-**アーキテクチャ/フロー**
-- シーケンス: CSV 取得 → 利用可否フィルタ → 現在位置 → 上位5件 → 地図表示 → Next 循環。
-- ルート UIは UI 骨格（地図/次候補の UI 下地）を [src/main.ts](src/main.ts) に実装。フィルタ UIは CSV ロードと日時ベースのフィルタを [src/filterApp.ts](src/filterApp.ts) に実装。
+## ミッションとビュー
+- Vite + TypeScript のクライアントアプリで近隣 AED 施設を案内する。UX は [index.html](index.html)→[src/main.ts](src/main.ts)（ルートビュー）、[filter.html](filter.html)→[src/filterApp.ts](src/filterApp.ts)（空き状況テスター）、[contact.html](contact.html)→[src/contact.ts](src/contact.ts)（119 番画面）に分かれる。
+- [docs/sequence.md](docs/sequence.md) の流れ（CSV 取得→フィルタ→現在地→上位候補→地図案内）を常に踏襲。
 
-**データ/CSV ロード**
-- 静的データ: [public/aed_data.csv](public/aed_data.csv)。ヘッダ1行あり、クオート内カンマ対応の手動パースは [src/csvLoader.ts](src/csvLoader.ts)。
-- 施設型 `AEDFacility` は列順が CSV と一致（型は [src/filter.ts](src/filter.ts)）。
-- GitHub Pages 用 `base: '/aed-navigation'` を前提にアセット参照は `import.meta.env.BASE_URL` を必ず考慮。
-  - 例（推奨）: `new URL('aed_data.csv', import.meta.env.BASE_URL).toString()`
-  - 現状例: `${import.meta.env.BASE_URL}/aed_data.csv`
+## データと型
+- 施設情報は [public/aed_data.csv](public/aed_data.csv)。列順が契約なので、フィールドを増やす際は [src/csvLoader.ts](src/csvLoader.ts) と [src/filter.ts](src/filter.ts) の `AEDFacility` を同時に更新。
+- `loadAEDDataFromCSV()` はクオート対応の手組み CSV 解析。スキーマ変更時もライブラリ追加ではなくここを拡張する。
+- GitHub Pages では `/aed-navigation` 配下で提供されるため、アセットは必ず `import.meta.env.BASE_URL` から解決する。
 
-**利用可否ロジック（[src/filter.ts](src/filter.ts)）**
-- 祝日判定は `@holiday-jp/holiday_jp`。`isJapaneseHoliday()`, `isPreviousDayHoliday()` を利用。
-- `isAvailable(facility, date)` の主な判定:
-  - `unavailableDates`（MM-DD のパイプ区切り）一致で不可。
-  - 祝日: `holidayAvailable` が false かつ `acceptableHolidays` 非一致なら不可。`invalidHolidays` 一致も不可。
-  - 祝日翌日: `holidayNextDayAvailable` が false なら不可。
-  - 第N曜日禁止: `unavailableNth*`（パイプ区切りの数値）に当該 N が含まれ、かつ `acceptableHolidays` 非一致なら不可。
-  - 営業時間（`HH:MM`）: `isWithinOperatingHours()` が翌日跨ぎ（例: 20:00→02:00）も許容。
-  - 開始/終了が時刻形式でない場合は「例外だが利用可能」を返す（現仕様）。
-- `filterAvailableFacilities()` が日時に対して利用可能な施設を返す。
+## 利用可否ルール（[src/filter.ts](src/filter.ts)）
+- `isAvailable()` は `@holiday-jp/holiday_jp` と CSV フラグを組み合わせる。`unavailableDates`（MM-DD）、`holidayAvailable`、`holidayNextDayAvailable`、曜日別 `unavailableNth*` を総合判定。
+- 祝日許可/禁止リストは祝日名で比較するので、CSV の表記を `holiday_jp` の `name` と揃える。
+- 営業時間は曜日ごと＋祝日専用スロットを持ち、`isWithinOperatingHours()` が翌日跨ぎにも対応。時刻でない文字列は現仕様で「利用可」。
+- `filterAvailableFacilities()` は副作用なし。メイン/フィルタ両 UI で共通利用してロジック差分を避ける。
 
-**UI/エントリ**
-- ルート UI: 初期 UI 骨格（地図背景、案内ボタン、次候補バー等）を [src/main.ts](src/main.ts) ＋ [src/style.css](src/style.css) に実装。Font Awesome は [index.html](index.html) の CDN。
-- フィルタ UI: 日付/時刻入力から `Date` を組み立て、`filterAvailableFacilities()` で結果を描画（[filter.html](filter.html), [src/filterApp.ts](src/filterApp.ts)）。
+## UI の責務
+- [src/main.ts](src/main.ts) は地図枠・操作ボタン・次候補バーなどの骨格を描画してから、絞り込み済み施設を `MapTools.setup()` に渡す。
+- [src/filterApp.ts](src/filterApp.ts) は `<input type="date">` / `<input type="time">` に初期値を入れ、`change` リスナーで DOM リストと件数を更新。
+- [src/contact.ts](src/contact.ts) は contact.html のマークアップを TS 化し、同じバンドラとスタイルを再利用する。
 
-**ビルド/開発**
-- コマンド: `npm install` / `npm run dev`（HMR, 5173）/ `npm run build`（型チェック後ビルド）/ `npm run preview`（4173）。詳細は [README.md](README.md)。
-- Vite 設定: [vite.config.ts](vite.config.ts)
-  - `base: '/aed-navigation'`
-  - エイリアス `@`→`src`
-  - マルチエントリ（`index.html`, `filter.html`）
-- TypeScript: [tsconfig.json](tsconfig.json)
-  - Bundler モード（`moduleResolution: 'bundler'`, `verbatimModuleSyntax` 等）
-  - 厳格設定（`strict`, `noUnused*`, `erasableSyntaxOnly`, `noUncheckedSideEffectImports`）
+## 地図とルーティング（[src/mapTools.ts](src/mapTools.ts)）
+- Leaflet + `leaflet.locatecontrol` + カスタム user marker を併用。`./libs/leaflet.usermarker.js`/`.css` の import を崩さない。
+- `getNowLocation()` は `navigator.geolocation.getCurrentPosition` を包む。依存機能を追加する際はフォールバック表示を忘れずに。
+- 距離ソートはユークリッド距離 $d=\sqrt{(\Delta lat)^2+(\Delta lon)^2}$ を使用し、`getRoute()` が OSRM (`https://router.project-osrm.org/route/v1/foot/...`) へ foot ルートを問い合わせて Polyline を描く。
+- `setup()` は `#map` ノードが既に存在し、1 件以上の施設が渡されている前提なので、DOM/フィルタ処理を呼び出し前に整える。
 
-**実装例**
+## ビルドとツール
+- 共通スクリプト: `npm run dev`（5173/HMR）、`npm run build`（`tsc --noEmit`→Vite）、`npm run preview`（4173/dist 配信）。詳細は [README.md](README.md)。
+- [vite.config.ts](vite.config.ts) は `base: '/aed-navigation'`、エイリアス `@`→`src`、複数 HTML エントリを設定。ページ追加時はこれに倣う。
+- [tsconfig.json](tsconfig.json) は `moduleResolution: 'bundler'`、`verbatimModuleSyntax`、`noUncheckedSideEffectImports` など厳格設定。未使用 import や暗黙 any はビルドで弾かれる。
+
+## 実装パターン
+- CSV→フィルタ→地図の責務を分離する。CSV パースは純粋関数、フィルタは入力 Date のみを参照、地図ツールはブラウザ API を扱う。
+- 新しいビューで施設データが必要な場合は次のパターンを再利用:
 ```ts
 import { loadAEDDataFromCSV } from '@/csvLoader.ts';
 import { filterAvailableFacilities } from '@/filter.ts';
@@ -49,11 +41,5 @@ const url = new URL('aed_data.csv', import.meta.env.BASE_URL).toString();
 const facilities = await loadAEDDataFromCSV(url);
 const available = filterAvailableFacilities(facilities, new Date());
 ```
-
-**統合ポイント/注意**
-- 位置情報 API / 地図ライブラリは未選定。導入時は依存と責務分離（CSV/フィルタ/位置/地図の境界維持）。
-- 祝日名の一致は CSV 値と `holiday_jp` の `name` が同一前提。表記差異に注意。
-- 翌日跨ぎ営業時間や祝日翌日の扱いを含むため、日付操作は `Date` 依存。タイムゾーン指定が必要なら要設計。
-- アセット/CSV 参照は必ず `BASE_URL` 前提で解決（GitHub Pages）。
-
-不明点や抜けがあればコメントください。必要に応じて詳細を追記・修正します。
+- Font Awesome は各 HTML で CDN から読み込むため、既存のクラス名に合わせればスタイルが整う。
+- 新データセットや API を導入したら [docs/sequence.md](docs/sequence.md) のフロー図を更新して整合を保つ。
