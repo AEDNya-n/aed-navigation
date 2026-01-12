@@ -99,6 +99,33 @@ body {
     background-color: #f1f3f4;
 }
 
+.destination-pin__wrapper {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.destination-pin__outer {
+    width: 18px;
+    height: 18px;
+    border-radius: 50% 50% 50% 0;
+    background: #ff6b35;
+    transform: rotate(-45deg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.25);
+}
+
+.destination-pin__inner {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #fff;
+}
+
 /*リアルタイム案内ボタン*/
 .guidance-button {
     position: absolute;

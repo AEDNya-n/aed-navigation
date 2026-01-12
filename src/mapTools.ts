@@ -33,6 +33,7 @@ export async function setup(
 
   const destination = sortedFacilities[0].facility;
   const map = initMapView(nowLocation);
+  renderDestinationPin(map, destination);
   const route = await getRoute(nowLocation, destination);
   if (route) {
     renderRoute(map, route);
@@ -76,6 +77,34 @@ function renderRoute(map: L.Map, route: L.LatLngExpression[]) {
   map.setView(bounds.getCenter())
   map.fitBounds(polyline.getBounds())
   console.log(map)
+}
+
+function renderDestinationPin(map: L.Map, destination: AEDFacility) {
+  const assetBaseUrl = new URL(import.meta.env.BASE_URL, window.location.origin);
+  const icon = L.divIcon({
+    className: 'destination-pin',
+    html: `
+      <div class="destination-pin__wrapper">
+        <div class="destination-pin__outer">
+          <div class="destination-pin__inner"></div>
+        </div>
+      </div>
+    `,
+    iconSize: [32, 32],
+    iconAnchor: [16, 30],
+    popupAnchor: [0, -32],
+  });
+
+  const marker = L.marker([destination.latitude, destination.longitude], {
+    icon,
+  }).addTo(map);
+
+  marker.bindPopup(`
+    <div class="destination-popup">
+      <strong>${destination.locationName}</strong><br />
+      <span>${destination.locationAddress ?? ''}</span>
+    </div>
+  `);
 }
 
 async function getRoute(nowLocation: NowLocation, destination: AEDFacility) {
