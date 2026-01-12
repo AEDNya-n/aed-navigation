@@ -80,7 +80,6 @@ function renderRoute(map: L.Map, route: L.LatLngExpression[]) {
 }
 
 function renderDestinationPin(map: L.Map, destination: AEDFacility) {
-  const assetBaseUrl = new URL(import.meta.env.BASE_URL, window.location.origin);
   const icon = L.divIcon({
     className: 'destination-pin',
     html: `
