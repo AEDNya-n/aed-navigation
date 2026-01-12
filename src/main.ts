@@ -80,16 +80,6 @@ async function renderApp(): Promise<void> {
   })
 }
 
-async function mapLoad(nowLocation: MapTools.NowLocation) {
-  console.log("mapload")
-  while (!document.getElementById("map-container")) {
-    console.log("sleep")
-    await new Promise(f => setTimeout(f, 1000))
-  }
-  mapLoad(nowLocation)
-}
-
-
 async function loadAndFilterFacilities(): Promise<AEDFacility[]> {
   const facilities = await loadAEDDataFromCSV(`${import.meta.env.BASE_URL}/aed_data.csv`);
   const currentDate = new Date();
