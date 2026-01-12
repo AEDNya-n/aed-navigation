@@ -18,7 +18,11 @@ async function renderApp(): Promise<void> {
 
   app.innerHTML = `
     <header class="header">
-      <h1>さいたまIT・WEB専門学校までのルート</h1>
+      <h1 id="facility-name">検索中…</h1>
+      <div class="facility-details">
+        <p id="location-organization">読み込み中…</p>
+        <p id="location-address">読み込み中…</p>
+      </div>
     </header>
 
     <main class="main-content">
@@ -37,7 +41,7 @@ async function renderApp(): Promise<void> {
       <div class="next-location-bar">
         <div class="location-info">
           <p class="label">次に近い場所</p>
-          <p class="dots">○○○○○○○○○○○○○○○○。</p>
+          <p class="location-name" id="next-location-name">検索中…</p>
         </div>
         <div class="refresh-icon">
           <i class="fa-solid fa-rotate"></i>
@@ -47,16 +51,12 @@ async function renderApp(): Promise<void> {
       <div class="info-section">
         <div class="info-row">
           <h2>利用可能時間</h2>
-          <p class="time-text">朝9:00〜夜21:00</p>
+          <p class="time-text" id="facility-time-text">読み込み中…</p>
         </div>
         <hr class="divider">
         <div class="info-row">
           <h2>補足</h2>
-          <div class="supplement-text">
-            <span>・月〜金使用可能</span>
-            <span>・祝日使用不可</span><br>
-            <span>・毎週土日使用不可</span>
-          </div>
+          <p class="supplement-text" id="facility-notes">情報を取得しています。</p>
         </div>
       </div>
     </main>
@@ -72,7 +72,12 @@ async function renderApp(): Promise<void> {
       </button>
     </footer>
   `
-  await MapTools.setup(facilities)
+  await MapTools.setup(facilities, {
+    onNearestReady: ({ nearestFacility, sortedFacilities }) => {
+      updateNearestFacilityDetails(nearestFacility)
+      updateNextLocationName(sortedFacilities)
+    }
+  })
 }
 
 async function mapLoad(nowLocation: MapTools.NowLocation) {
@@ -90,6 +95,39 @@ async function loadAndFilterFacilities(): Promise<AEDFacility[]> {
   const currentDate = new Date();
   const availableFacilities = filterAvailableFacilities(facilities, currentDate);
   return availableFacilities;
+}
+
+function updateNearestFacilityDetails(facility: AEDFacility): void {
+  const facilityNameEl = document.getElementById("facility-name")
+  if (facilityNameEl) facilityNameEl.textContent = facility.locationName
+
+  const orgEl = document.getElementById("location-organization")
+  if (orgEl) orgEl.textContent = facility.organizationName
+
+  const addressEl = document.getElementById("location-address")
+  if (addressEl) addressEl.textContent = facility.locationAddress || "住所情報なし"
+
+  const timeEl = document.getElementById("facility-time-text")
+  if (timeEl) timeEl.textContent = facility.availableDays || "利用時間情報は登録されていません"
+
+  const notesEl = document.getElementById("facility-notes")
+  if (notesEl) {
+    notesEl.textContent = facility.notes ? facility.notes : "特記事項は登録されていません"
+  }
+}
+
+function formatCoordinates(facility: AEDFacility): string {
+  const latitude = Number.isFinite(facility.latitude) ? facility.latitude.toFixed(5) : "-"
+  const longitude = Number.isFinite(facility.longitude) ? facility.longitude.toFixed(5) : "-"
+  return `緯度 ${latitude} / 経度 ${longitude}`
+}
+
+function updateNextLocationName(sortedFacilities: MapTools.FacilityDistance[]): void {
+  const nameEl = document.getElementById("next-location-name")
+  if (!nameEl) return
+
+  const secondFacility = sortedFacilities[1]?.facility
+  nameEl.textContent = secondFacility ? secondFacility.locationName : "他の候補はありません"
 }
 
 // アプリケーション起動

@@ -3,24 +3,46 @@ import "./libs/leaflet.usermarker.js"
 import L from "leaflet"
 import type { AEDFacility } from "./filter.js";
 
-interface NowLocation {
+export interface NowLocation {
   latitude: number;
   longitude: number;
 }
 
-interface DistanceList {
-  name: string,
-  distance: number
+export interface FacilityDistance {
+  facility: AEDFacility;
+  distance: number;
 }
 
-export async function setup(facilities: AEDFacility[]) {
-  const nowLocation = await getNowLocation()
-  const map = initMapView(nowLocation)
-  const distanceList = getNearLocation(nowLocation, facilities)
-  const destination = facilities.find((element) => element.locationName === distanceList[0].name)
-  if (!destination) return
-  const route = await getRoute(nowLocation, destination)
-  renderRoute(map, route)
+export interface SetupOptions {
+  onNearestReady?: (payload: {
+    nearestFacility: AEDFacility;
+    nowLocation: NowLocation;
+    sortedFacilities: FacilityDistance[];
+  }) => void;
+}
+
+export async function setup(
+  facilities: AEDFacility[],
+  options?: SetupOptions
+): Promise<void> {
+  if (!facilities.length) return;
+
+  const nowLocation = await getNowLocation();
+  const sortedFacilities = getFacilitiesByDistance(nowLocation, facilities);
+  if (!sortedFacilities.length) return;
+
+  const destination = sortedFacilities[0].facility;
+  const map = initMapView(nowLocation);
+  const route = await getRoute(nowLocation, destination);
+  if (route) {
+    renderRoute(map, route);
+  }
+
+  options?.onNearestReady?.({
+    nearestFacility: destination,
+    nowLocation,
+    sortedFacilities,
+  });
 }
 
 function initMapView(nowLocation: NowLocation){
@@ -44,16 +66,16 @@ function initMapView(nowLocation: NowLocation){
 }
 
 function renderRoute(map: L.Map, route: L.LatLngExpression[]) {
-      const polyline = L.polyline(route, {
-        color: 'blue',
-        weight: 5,
-        opacity: 0.5,
-      }).addTo(map)
-      
-      const bounds = L.latLngBounds(route)
-      map.setView(bounds.getCenter())
-      map.fitBounds(polyline.getBounds())
-      console.log(map)
+  const polyline = L.polyline(route, {
+    color: 'blue',
+    weight: 5,
+    opacity: 0.5,
+  }).addTo(map)
+
+  const bounds = L.latLngBounds(route)
+  map.setView(bounds.getCenter())
+  map.fitBounds(polyline.getBounds())
+  console.log(map)
 }
 
 async function getRoute(nowLocation: NowLocation, destination: AEDFacility) {
@@ -74,20 +96,19 @@ async function getRoute(nowLocation: NowLocation, destination: AEDFacility) {
     }
   } catch (error) {
     console.error("Error fetching route data:", error);
-  } 
+  }
 }
 
-function getNearLocation(nowLocation: NowLocation, facilities: AEDFacility[]) {
-  let distanceList: DistanceList[] = []
-  facilities.forEach(element => {
-    distanceList.push({name: element.locationName, distance: getEuclidRange(nowLocation, element)})
-  });
-  
-  distanceList.sort((a, b) => {
-    return b - a
-  })
-
-  return distanceList
+export function getFacilitiesByDistance(
+  nowLocation: NowLocation,
+  facilities: AEDFacility[]
+): FacilityDistance[] {
+  return facilities
+    .map((facility) => ({
+      facility,
+      distance: getEuclidRange(nowLocation, facility),
+    }))
+    .sort((a, b) => a.distance - b.distance)
 }
 
 function getEuclidRange(nowLocation: NowLocation, destination: AEDFacility): number {
@@ -96,7 +117,7 @@ function getEuclidRange(nowLocation: NowLocation, destination: AEDFacility): num
   return Math.sqrt(latDiff + lonDiff)
 }
 
-async function getNowLocation(): Promise<NowLocation>{
+export async function getNowLocation(): Promise<NowLocation>{
   return new Promise((resolve, reject) => {
   
     async function success(position) {
