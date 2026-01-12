@@ -4,50 +4,64 @@ import type { AEDFacility } from "./filter.ts";
  * CSVをパースしてAEDFacilityオブジェクトの配列に変換
  */
 export async function loadAEDDataFromCSV(csvUrl: string): Promise<AEDFacility[]> {
-  const response = await fetch(csvUrl);
-  const csvText = await response.text();
-  
-  const lines = csvText.trim().split("\n");
-  
-  const facilities: AEDFacility[] = [];
-  
-  // Skip header row
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i];
-    if (!line.trim()) continue;
+  try {
+    const response = await fetch(csvUrl);
     
-    // CSVの値を解析（カンマ区切り、クオートも考慮）
-    const values: string[] = [];
-    let currentValue = "";
-    let insideQuotes = false;
-    
-    for (let j = 0; j < line.length; j++) {
-      const char = line[j];
-      
-      if (char === '"') {
-        insideQuotes = !insideQuotes;
-      } else if (char === "," && !insideQuotes) {
-        values.push(currentValue.trim());
-        currentValue = "";
-      } else {
-        currentValue += char;
-      }
+    if (!response.ok) {
+      throw new Error(`CSVファイル読み込みエラー: HTTP ${response.status} ${response.statusText}`);
     }
-    values.push(currentValue.trim());
     
-    // AEDFacilityオブジェクトを構築
-    const facility: AEDFacility = {
-      id: parseInt(values[0]) || 0,
-      organizationCode: values[1] || "",
-      organizationName: values[2] || "",
-      locationName: values[3] || "",
-      locationNameKana: values[4] || "",
-      locationAddress: values[5] || "",
-      latitude: parseFloat(values[6]) || 0,
-      longitude: parseFloat(values[7]) || 0,
-      availableDays: values[8] || "",
-      mondayAvailableStartTime: values[9] || "",
-      mondayAvailableEndTime: values[10] || "",
+    const csvText = await response.text();
+    
+    if (!csvText || csvText.trim().length === 0) {
+      throw new Error("CSVファイルが空です");
+    }
+    
+    const lines = csvText.trim().split("\n");
+    
+    if (lines.length < 2) {
+      throw new Error("CSVファイルにヘッダーおよびデータ行がありません");
+    }
+    
+    const facilities: AEDFacility[] = [];
+    
+    // Skip header row
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i];
+      if (!line.trim()) continue;
+      
+      // CSVの値を解析（カンマ区切り、クオートも考慮）
+      const values: string[] = [];
+      let currentValue = "";
+      let insideQuotes = false;
+      
+      for (let j = 0; j < line.length; j++) {
+        const char = line[j];
+        
+        if (char === '"') {
+          insideQuotes = !insideQuotes;
+        } else if (char === "," && !insideQuotes) {
+          values.push(currentValue.trim());
+          currentValue = "";
+        } else {
+          currentValue += char;
+        }
+      }
+      values.push(currentValue.trim());
+      
+      // AEDFacilityオブジェクトを構築
+      const facility: AEDFacility = {
+        id: parseInt(values[0]) || 0,
+        organizationCode: values[1] || "",
+        organizationName: values[2] || "",
+        locationName: values[3] || "",
+        locationNameKana: values[4] || "",
+        locationAddress: values[5] || "",
+        latitude: parseFloat(values[6]) || 0,
+        longitude: parseFloat(values[7]) || 0,
+        availableDays: values[8] || "",
+        mondayAvailableStartTime: values[9] || "",
+        mondayAvailableEndTime: values[10] || "",
       tuesdayAvailableStartTime: values[11] || "",
       tuesdayAvailableEndTime: values[12] || "",
       wednesdayAvailableStartTime: values[13] || "",
@@ -80,5 +94,10 @@ export async function loadAEDDataFromCSV(csvUrl: string): Promise<AEDFacility[]>
     facilities.push(facility);
   }
   
+  console.log(`CSVから${facilities.length}件の施設を読み込みました`);
   return facilities;
+  } catch (error) {
+    console.error("CSVロードエラー:", error);
+    throw new Error(`AED施設データの読み込みに失敗しました: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }

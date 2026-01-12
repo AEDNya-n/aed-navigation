@@ -8,6 +8,14 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'),
     },
   },
+  server: {
+    host: 'localhost', // localhost のみで実行（セキュアコンテキス扱い）
+    port: 5173,
+  },
+  preview: {
+    host: 'localhost', // localhost のみで実行（セキュアコンテキス扱い）
+    port: 4173,
+  },
   build: {
     rollupOptions: {
       input: {

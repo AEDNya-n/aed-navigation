@@ -36,23 +36,42 @@ export async function setup(
 ): Promise<void> {
   if (!facilities.length) return;
 
-  const nowLocation = await getNowLocation();
-  const sortedFacilities = getFacilitiesByDistance(nowLocation, facilities);
-  if (!sortedFacilities.length) return;
+  try {
+    const nowLocation = await getNowLocation();
+    const sortedFacilities = getFacilitiesByDistance(nowLocation, facilities);
+    if (!sortedFacilities.length) return;
 
-  const destination = sortedFacilities[0].facility;
-  const map = initMapView(nowLocation);
-  renderDestinationPin(map, destination);
-  const route = await getRoute(nowLocation, destination);
-  if (route) {
-    renderRoute(map, route);
+    const destination = sortedFacilities[0].facility;
+    const map = initMapView(nowLocation);
+    renderDestinationPin(map, destination);
+    const route = await getRoute(nowLocation, destination);
+    if (route) {
+      renderRoute(map, route);
+    }
+
+    options?.onNearestReady?.({
+      nearestFacility: destination,
+      nowLocation,
+      sortedFacilities,
+    });
+  } catch (error) {
+    console.error("地図セットアップエラー:", error);
+    const mapEl = document.getElementById("map");
+    if (mapEl) {
+      mapEl.innerHTML = `
+        <div class="error-message" style="display: flex; align-items: center; justify-content: center; height: 100%; flex-direction: column; gap: 20px; padding: 20px; text-align: center;">
+          <i class="fa-solid fa-location-dot" style="font-size: 48px; color: #ccc;"></i>
+          <div>
+            <p style="font-weight: bold; margin-bottom: 8px;">位置情報の取得に失敗しました</p>
+            <p style="font-size: 14px; color: #666;">
+              ${error instanceof Error ? error.message : '予期しないエラーが発生しました'}
+            </p>
+            <p style="font-size: 12px; color: #999; margin-top: 12px;">ブラウザの設定で位置情報へのアクセスを許可してください</p>
+          </div>
+        </div>
+      `;
+    }
   }
-
-  options?.onNearestReady?.({
-    nearestFacility: destination,
-    nowLocation,
-    sortedFacilities,
-  });
 }
 
 function initMapView(nowLocation: NowLocation): L.Map {
@@ -173,24 +192,57 @@ function getEuclidRange(nowLocation: NowLocation, destination: AEDFacility): num
 
 export async function getNowLocation(): Promise<NowLocation>{
   return new Promise((resolve, reject) => {
-  
-    async function success(position: GeolocationPosition) {
+    // セキュアコンテキストの確認
+    if (!window.isSecureContext) {
+      console.warn("警告: セキュアコンテキストではありません。位置情報へのアクセスが制限される可能性があります。");
+      console.warn(`現在のプロトコル: ${window.location.protocol}`);
+      console.warn(`現在のホスト: ${window.location.hostname}`);
+    }
+
+    if (!navigator.geolocation) {
+      reject(new Error("このブラウザーは位置情報に対応していません"))
+      return
+    }
+
+    function success(position: GeolocationPosition) {
+      console.info("位置情報取得成功:", {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      });
       resolve({
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
       })
     }
-  
-    function error() {
-      reject(new Error("Unable to retrieve your location"))
-      return
+
+    function error(err: GeolocationPositionError) {
+      let errorMsg = err.message;
+      
+      // エラーコードごとの詳細メッセージ
+      if (err.code === 1) {
+        errorMsg = "ユーザーが位置情報へのアクセスを拒否しました";
+      } else if (err.code === 2) {
+        errorMsg = "位置情報が取得できません（GPS信号が弱い可能性があります）";
+      } else if (err.code === 3) {
+        errorMsg = "位置情報の取得がタイムアウトしました（ネットワーク接続を確認してください）";
+      }
+      
+      console.error("位置情報取得エラー:", {
+        code: err.code,
+        message: err.message,
+        translatedMessage: errorMsg
+      });
+      reject(new Error(errorMsg))
     }
-  
-    if (!navigator.geolocation) {
-      reject(new Error("このブラウザーは位置情報に対応していません"))
-    } else {
-      console.info("位置情報を取得中…");
-      navigator.geolocation.getCurrentPosition(success, error);
-    }
+
+    console.info("位置情報を取得中…");
+    console.info(`セキュアコンテキスト: ${window.isSecureContext ? "はい（HTTPS）" : "いいえ（HTTP）"}`);
+    
+    // タイムアウト10秒、最大キャッシュ5秒、高精度を有効化
+    navigator.geolocation.getCurrentPosition(success, error, {
+      timeout: 10000,
+      maximumAge: 5000,
+      enableHighAccuracy: true
+    });
   })
 }
