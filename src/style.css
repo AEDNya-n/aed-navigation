@@ -212,10 +212,43 @@ body {
     font-weight: 600;
 }
 
-.refresh-icon {
-    font-size: 22px;
+.adjacent-names {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    opacity: 0.85;
+}
+
+.adjacent-label {
+    font-weight: 600;
+}
+
+.adjacent-separator {
+    opacity: 0.6;
+}
+
+.location-nav-button {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    color: #d7f3d7;
+    transition: background-color 0.2s ease;
+}
+
+.location-nav-button:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.location-nav-button:disabled {
+    opacity: 0.5;
+    cursor: default;
 }
 
 /*AEDの情報部分*/
