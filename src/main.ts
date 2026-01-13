@@ -70,23 +70,24 @@ async function renderApp(): Promise<void> {
     </main>
 
     <footer class="footer-actions">
-      <button class="action-btn">
+      <button class="action-btn" data-footer-action="call">
         <span class="iconify" data-icon="lucide:phone-call"></span>
         <span>救急連絡</span>
       </button>
 
-      <button class="action-btn active">
+      <button class="action-btn active" data-footer-action="map">
         <span class="iconify" data-icon="material-symbols:map-outline-sharp"></span>
         <span>最短地図</span>
       </button>
 
-      <button class="action-btn">
+      <button class="action-btn" data-footer-action="aid">
         <span class="iconify" data-icon="material-symbols:medical-services-outline-rounded"></span>
         <span>応急処置</span>
       </button>
     </footer>
   `
   setupNavigationControls();
+  setupFooterNavigation();
   await MapTools.setup(facilities, {
     onNearestReady: ({ sortedFacilities }) => {
       initializeNavigation(sortedFacilities)
@@ -232,6 +233,26 @@ function updateNavigationControls(): void {
 
   if (prevButton) prevButton.disabled = navigationState.currentIndex === 0;
   if (nextButton) nextButton.disabled = navigationState.currentIndex >= navigationState.sortedFacilities.length - 1;
+}
+
+function setupFooterNavigation(): void {
+  const callButton = document.querySelector<HTMLButtonElement>('[data-footer-action="call"]');
+  const mapButton = document.querySelector<HTMLButtonElement>('[data-footer-action="map"]');
+  const aidButton = document.querySelector<HTMLButtonElement>('[data-footer-action="aid"]');
+
+  callButton?.addEventListener('click', () => {
+    window.location.href = `${import.meta.env.BASE_URL}/contact.html`;
+  });
+
+  mapButton?.addEventListener('click', () => {
+    if (!mapButton.classList.contains('active')) {
+      window.location.href = `${import.meta.env.BASE_URL}`;
+    }
+  });
+
+  aidButton?.addEventListener('click', () => {
+    window.open('https://www.fdma.go.jp/mission/enrichment/appropriate/', '_blank');
+  });
 }
 
 function setupGuidanceButton(facility: AEDFacility): void {

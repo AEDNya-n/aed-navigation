@@ -183,6 +183,18 @@ body {
     text-decoration: underline;
 }
 
+.emergency-overlay {
+    background-color: #d32f2f;
+}
+
+.emergency-overlay .icon-circle {
+    color: #d32f2f;
+}
+
+.emergency-overlay .main-text {
+    font-weight: 700;
+}
+
 /*次に近い場所バー*/
 .next-location-bar {
     background-color: #126A12;
@@ -228,6 +240,13 @@ body {
     opacity: 0.6;
 }
 
+.contact-location-bar {
+    background-color: #126A12;
+    color: white;
+    padding: 14px 18px;
+    flex-shrink: 0;
+}
+
 .location-nav-button {
     background: rgba(255, 255, 255, 0.15);
     border: none;
@@ -260,6 +279,15 @@ body {
     border-radius: 18px 18px 0 0;
     overflow-y: auto;
     max-height: 45vh; /* 下半分くらいに収める */
+}
+
+.contact-info {
+    padding-top: 24px;
+    gap: 6px;
+}
+
+.contact-info .supplement-text {
+    line-height: 1.7;
 }
 
 .info-row {
@@ -358,6 +386,22 @@ body {
 .address-text {
     font-size: 16px;
     font-weight: bold;
+}
+
+.map-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #444;
+    padding: 24px;
+    height: 100%;
+}
+
+.map-error i {
+    font-size: 32px;
+    color: #d32f2f;
 }
 
 /*フッター*/
