@@ -30,6 +30,11 @@ export interface SetupOptions {
   }) => void;
 }
 
+let mapInstance: L.Map | null = null;
+let destinationMarker: L.Marker | null = null;
+let routePolyline: L.Polyline | null = null;
+let nowLocationCache: NowLocation | null = null;
+
 export async function setup(
   facilities: AEDFacility[],
   options?: SetupOptions
@@ -42,11 +47,21 @@ export async function setup(
     if (!sortedFacilities.length) return;
 
     const destination = sortedFacilities[0].facility;
+    console.info("Map setup", {
+      facilityCount: facilities.length,
+      availableDestinations: sortedFacilities.length,
+      initialDestination: destination.locationName,
+    });
     const map = initMapView(nowLocation);
-    renderDestinationPin(map, destination);
+    mapInstance = map;
+    nowLocationCache = nowLocation;
+
+    destinationMarker = renderDestinationPin(map, destination);
     const route = await getRoute(nowLocation, destination);
     if (route) {
-      renderRoute(map, route);
+      routePolyline = renderRoute(map, route);
+    } else {
+      centerOnDestination(map, destination);
     }
 
     options?.onNearestReady?.({
@@ -94,20 +109,20 @@ function initMapView(nowLocation: NowLocation): L.Map {
   return map
 }
 
-function renderRoute(map: L.Map, route: L.LatLngExpression[]) {
+function renderRoute(map: L.Map, route: L.LatLngExpression[]): L.Polyline {
   const polyline = L.polyline(route, {
     color: 'blue',
     weight: 5,
     opacity: 0.5,
-  }).addTo(map)
+  }).addTo(map);
 
-  const bounds = L.latLngBounds(route)
-  map.setView(bounds.getCenter())
-  map.fitBounds(polyline.getBounds())
-  console.log(map)
+  const bounds = L.latLngBounds(route);
+  map.setView(bounds.getCenter());
+  map.fitBounds(polyline.getBounds());
+  return polyline;
 }
 
-function renderDestinationPin(map: L.Map, destination: AEDFacility) {
+function renderDestinationPin(map: L.Map, destination: AEDFacility): L.Marker {
   const icon = L.divIcon({
     className: 'destination-pin',
     html: `
@@ -140,6 +155,7 @@ function renderDestinationPin(map: L.Map, destination: AEDFacility) {
   popupContent.appendChild(addressElement);
 
   marker.bindPopup(popupContent);
+  return marker;
 }
 
 async function getRoute(
@@ -165,8 +181,18 @@ async function getRoute(
     if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
       const route = data.routes[0]
       const routeCoord = route.geometry.coordinates.map((coords: [number, number]) => L.latLng(coords[1],coords[0]))
+      console.info("Route data fetched", {
+        distance: route.distance,
+        duration: route.duration,
+        points: routeCoord.length,
+      });
       return routeCoord
     }
+    console.warn("Route data unavailable", {
+      code: data.code,
+      routesLength: data.routes?.length,
+      message: data.message,
+    });
   } catch (error) {
     console.error("Error fetching route data:", error);
   }
@@ -245,4 +271,46 @@ export async function getNowLocation(): Promise<NowLocation>{
       enableHighAccuracy: true
     });
   })
+}
+
+export async function updateDestination(facility: AEDFacility): Promise<void> {
+  if (!mapInstance || !nowLocationCache) {
+    console.warn("地図が初期化されていません");
+    return;
+  }
+
+  console.info("Update destination", {
+    facility: facility.locationName,
+    latitude: facility.latitude,
+    longitude: facility.longitude,
+    hasMarker: Boolean(destinationMarker),
+    hasRoute: Boolean(routePolyline),
+  });
+
+  if (destinationMarker) {
+    mapInstance.removeLayer(destinationMarker);
+    destinationMarker = null;
+  }
+
+  if (routePolyline) {
+    mapInstance.removeLayer(routePolyline);
+    routePolyline = null;
+  }
+
+  destinationMarker = renderDestinationPin(mapInstance, facility);
+  const route = await getRoute(nowLocationCache, facility);
+  if (route) {
+    console.info("Route update success", {
+      pointCount: route.length,
+    });
+    routePolyline = renderRoute(mapInstance, route);
+    return;
+  }
+
+  console.warn("Route update skipped; centering on destination");
+  centerOnDestination(mapInstance, facility);
+}
+
+function centerOnDestination(map: L.Map, facility: AEDFacility): void {
+  map.setView([facility.latitude, facility.longitude], Math.max(map.getZoom(), 18));
 }

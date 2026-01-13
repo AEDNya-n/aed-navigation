@@ -37,13 +37,23 @@ async function renderApp(): Promise<void> {
       </div>
 
       <div class="next-location-bar">
+        <button class="location-nav-button prev" aria-label="前の候補">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
         <div class="location-info">
-          <p class="label">次に近い場所</p>
-          <p class="location-name" id="next-location-name">検索中…</p>
+          <p class="label">表示中の地点</p>
+          <p class="location-name" id="current-location-name">検索中…</p>
+          <p class="adjacent-names">
+            <span class="adjacent-label">前:</span>
+            <span id="prev-location-name">なし</span>
+            <span class="adjacent-separator">|</span>
+            <span class="adjacent-label">次:</span>
+            <span id="next-location-name">検索中…</span>
+          </p>
         </div>
-        <div class="refresh-icon">
-          <i class="fa-solid fa-rotate"></i>
-        </div>
+        <button class="location-nav-button next" aria-label="次の候補">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
       </div>
 
       <div class="info-section">
@@ -76,11 +86,10 @@ async function renderApp(): Promise<void> {
       </button>
     </footer>
   `
+  setupNavigationControls();
   await MapTools.setup(facilities, {
-    onNearestReady: ({ nearestFacility, sortedFacilities }) => {
-      updateNearestFacilityDetails(nearestFacility)
-      updateNextLocationName(sortedFacilities)
-      setupGuidanceButton(nearestFacility)
+    onNearestReady: ({ sortedFacilities }) => {
+      initializeNavigation(sortedFacilities)
     }
   })
 }
@@ -90,6 +99,69 @@ async function loadAndFilterFacilities(): Promise<AEDFacility[]> {
   const currentDate = new Date();
   const availableFacilities = filterAvailableFacilities(facilities, currentDate);
   return availableFacilities;
+}
+
+interface NavigationState {
+  sortedFacilities: MapTools.FacilityDistance[];
+  currentIndex: number;
+}
+
+let navigationState: NavigationState | null = null;
+
+function initializeNavigation(sortedFacilities: MapTools.FacilityDistance[]): void {
+  console.info("Navigation init", {
+    total: sortedFacilities.length,
+    firstFacility: sortedFacilities[0]?.facility.locationName,
+  });
+  navigationState = {
+    sortedFacilities,
+    currentIndex: 0,
+  };
+
+  applyFacilitySelection({ skipMapUpdate: true });
+  updateNavigationControls();
+}
+
+function applyFacilitySelection(options?: { skipMapUpdate?: boolean }): void {
+  if (!navigationState || !navigationState.sortedFacilities.length) return;
+
+  const facility = navigationState.sortedFacilities[navigationState.currentIndex]?.facility;
+  if (!facility) return;
+
+  console.info("Apply facility selection", {
+    index: navigationState.currentIndex,
+    total: navigationState.sortedFacilities.length,
+    facility: facility.locationName,
+    latitude: facility.latitude,
+    longitude: facility.longitude,
+    skipMapUpdate: Boolean(options?.skipMapUpdate),
+  });
+
+  updateNearestFacilityDetails(facility);
+  updateCurrentLocationName(facility.locationName);
+  updateAdjacentLocationNames();
+  setupGuidanceButton(facility);
+  updateNavigationControls();
+
+  if (!options?.skipMapUpdate) {
+    void MapTools.updateDestination(facility);
+  }
+}
+
+function moveFacilitySelection(step: number): void {
+  if (!navigationState) return;
+  const nextIndex = navigationState.currentIndex + step;
+  if (nextIndex < 0 || nextIndex >= navigationState.sortedFacilities.length) return;
+
+  console.info("Move facility selection", {
+    currentIndex: navigationState.currentIndex,
+    step,
+    nextIndex,
+    total: navigationState.sortedFacilities.length,
+  });
+
+  navigationState.currentIndex = nextIndex;
+  applyFacilitySelection();
 }
 
 function updateNearestFacilityDetails(facility: AEDFacility): void {
@@ -109,12 +181,57 @@ function updateNearestFacilityDetails(facility: AEDFacility): void {
   }
 }
 
-function updateNextLocationName(sortedFacilities: MapTools.FacilityDistance[]): void {
-  const nameEl = document.getElementById("next-location-name")
-  if (!nameEl) return
+function updateCurrentLocationName(name: string | undefined): void {
+  const nameEl = document.getElementById("current-location-name");
+  if (nameEl) nameEl.textContent = name ?? "名称不明";
+}
 
-  const secondFacility = sortedFacilities[1]?.facility
-  nameEl.textContent = secondFacility ? secondFacility.locationName : "他の候補はありません"
+function updateAdjacentLocationNames(): void {
+  const prevNameEl = document.getElementById("prev-location-name");
+  const nextNameEl = document.getElementById("next-location-name");
+  if (!navigationState) {
+    if (prevNameEl) prevNameEl.textContent = "なし";
+    if (nextNameEl) nextNameEl.textContent = "なし";
+    return;
+  }
+
+  const { sortedFacilities, currentIndex } = navigationState;
+  const prevFacility = sortedFacilities[currentIndex - 1]?.facility;
+  const nextFacility = sortedFacilities[currentIndex + 1]?.facility;
+
+  if (prevNameEl) prevNameEl.textContent = prevFacility ? prevFacility.locationName : "なし";
+  if (nextNameEl) nextNameEl.textContent = nextFacility ? nextFacility.locationName : "なし";
+}
+
+function setupNavigationControls(): void {
+  const prevButton = document.querySelector<HTMLButtonElement>('.location-nav-button.prev');
+  const nextButton = document.querySelector<HTMLButtonElement>('.location-nav-button.next');
+
+  prevButton?.addEventListener('click', () => {
+    console.debug("Prev button clicked");
+    moveFacilitySelection(-1);
+  });
+  nextButton?.addEventListener('click', () => {
+    console.debug("Next button clicked");
+    moveFacilitySelection(1);
+  });
+}
+
+function updateNavigationControls(): void {
+  const prevButton = document.querySelector<HTMLButtonElement>('.location-nav-button.prev');
+  const nextButton = document.querySelector<HTMLButtonElement>('.location-nav-button.next');
+
+  if (!navigationState) {
+    if (prevButton) prevButton.disabled = true;
+    if (nextButton) nextButton.disabled = true;
+    return;
+  }
+
+  prevButton?.setAttribute('aria-disabled', String(navigationState.currentIndex === 0));
+  nextButton?.setAttribute('aria-disabled', String(navigationState.currentIndex >= navigationState.sortedFacilities.length - 1));
+
+  if (prevButton) prevButton.disabled = navigationState.currentIndex === 0;
+  if (nextButton) nextButton.disabled = navigationState.currentIndex >= navigationState.sortedFacilities.length - 1;
 }
 
 function setupGuidanceButton(facility: AEDFacility): void {
