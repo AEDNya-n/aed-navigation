@@ -20,8 +20,7 @@ async function renderApp(): Promise<void> {
     <header class="header">
       <h1 id="facility-name">検索中…</h1>
       <div class="facility-details">
-        <p id="location-organization">読み込み中…</p>
-        <p id="location-address">読み込み中…</p>
+        <p id="location-address">読み込み中…</p> 
       </div>
     </header>
 
@@ -91,11 +90,9 @@ function updateNearestFacilityDetails(facility: AEDFacility): void {
   const facilityNameEl = document.getElementById("facility-name")
   if (facilityNameEl) facilityNameEl.textContent = facility.locationName
 
-  const orgEl = document.getElementById("location-organization")
-  if (orgEl) orgEl.textContent = facility.organizationName
 
   const addressEl = document.getElementById("location-address")
-  if (addressEl) addressEl.textContent = facility.locationAddress || "住所情報なし"
+  if (addressEl) addressEl.textContent = `${facility.locationName} ${facility.locationAddress} `
 
   const timeEl = document.getElementById("facility-time-text")
   if (timeEl) timeEl.textContent = facility.availableDays || "利用時間情報は登録されていません"
