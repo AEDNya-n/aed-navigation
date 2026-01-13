@@ -143,22 +143,22 @@ body {
     background-color: #126A12;
     color: white;
     border: none;
-    border-radius: 12px;
-    padding: 12px 15px;
+    border-radius: 8px; /* 角丸を少し小さく */
+    padding: 8px 12px; /* パディングを縮小 */
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px; /* ギャップを縮小 */
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     cursor: pointer;
-    z-index: 10;
+    z-index: 1000; /* 地図の上に確実に表示されるように数値を上げる */
 }
 
 .guidance-button .icon-circle {
-    font-size: 24px;
+    font-size: 18px; /* アイコンサイズ縮小 */
     color: #4285F4;
     background: white;
-    width: 36px;
-    height: 36px;
+    width: 28px; /* 入る円を縮小 */
+    height: 28px; /* 入る円を縮小 */
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -173,13 +173,13 @@ body {
 /*地図上の吹き出しの文字*/
 .guidance-button .main-text {
     display: block;
-    font-size: 14px;
+    font-size: 12px; /* 文字サイズ縮小 */
     font-weight: normal;
     text-decoration: underline;
 }
 
 .guidance-button .sub-text {
-    font-size: 12px;
+    font-size: 10px; /* サブテキストも縮小 */
     text-decoration: underline;
 }
 
