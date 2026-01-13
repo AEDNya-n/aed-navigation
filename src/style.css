@@ -331,8 +331,7 @@ body {
 .footer-actions {
     display: flex;
     width: 100%;
-    height: 60px;
-
+    min-height: 60px;
     flex-shrink: 0;
     padding-bottom: env(safe-area-inset-bottom);
     background-color: #3DA73D; /* 背景色を追加してセーフエリアも同じ色にする */
@@ -361,7 +360,11 @@ body {
 }
 
 .action-btn .iconify {
-    font-size: 30px;
+    font-size: var(--footer-icon-size);
+    width: var(--footer-icon-size);
+    height: var(--footer-icon-size);
+    line-height: 1;
+    flex-shrink: 0;
 }
 
 .action-btn.active {
@@ -372,16 +375,12 @@ body {
 @media screen and (max-height: 700px) {
     
     .footer-actions {
-        height: 50px;
+        min-height: 50px;
     }
 
     .action-btn {
-        font-size: 10px;
+        font-size: 24px;
         gap: 3px;
-    }
-
-    .action-btn .iconify {
-        font-size: 26px;
     }
 
     .map-container {
@@ -391,13 +390,27 @@ body {
 
 /* レスポンシブ調整: 小さい画面対応 */
 @media (max-height: 700px) {
-    .map-container {
-        min-height: 0; /* フレキシブルに縮小可能にする */
-        flex-basis: 45%; /* 小さい画面では地図の割合を指定 */
+    .footer-actions {
+        min-height: 50px;
     }
-    
+
+    .action-btn {
+        font-size: 12px;
+        gap: 3px;
+    }
+
+    .action-btn .iconify {
+        font-size: var(--footer-icon-size);
+        width: var(--footer-icon-size);
+        height: var(--footer-icon-size);
+    }
+
+    .map-container {
+        min-height: 0;
+        flex-basis: 45%;
+    }
+
     .info-section {
-        padding: 12px 15px; /* 余白を削減 */
         max-height: 55vh;
     }
 
@@ -413,17 +426,8 @@ body {
         font-size: 18px;
         margin-bottom: 2px;
     }
+}
 
-    .footer-actions {
-        min-height: 60px;
-    }
-    
-    .action-btn i {
-        font-size: 24px;
-    }
-    
-    .action-btn {
-        font-size: 12px;
-        gap: 4px;
-    }
+:root {
+    --footer-icon-size: 28px;
 }
