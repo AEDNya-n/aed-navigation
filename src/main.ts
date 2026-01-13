@@ -20,8 +20,7 @@ async function renderApp(): Promise<void> {
     <header class="header">
       <h1 id="facility-name">検索中…</h1>
       <div class="facility-details">
-        <p id="location-organization">読み込み中…</p>
-        <p id="location-address">読み込み中…</p>
+        <p id="location-address">読み込み中…</p> 
       </div>
     </header>
 
@@ -32,8 +31,7 @@ async function renderApp(): Promise<void> {
             <i class="fa-solid fa-location-dot"></i>
           </div>
           <div class="text-box">
-            <span class="main-text">リアルタイム案内</span>
-            <span class="sub-text">を開始する</span>
+            <span class="main-text">Google Map</span>
           </div>
         </button>
       </div>
@@ -82,6 +80,7 @@ async function renderApp(): Promise<void> {
     onNearestReady: ({ nearestFacility, sortedFacilities }) => {
       updateNearestFacilityDetails(nearestFacility)
       updateNextLocationName(sortedFacilities)
+      setupGuidanceButton(nearestFacility)
     }
   })
 }
@@ -97,11 +96,9 @@ function updateNearestFacilityDetails(facility: AEDFacility): void {
   const facilityNameEl = document.getElementById("facility-name")
   if (facilityNameEl) facilityNameEl.textContent = facility.locationName
 
-  const orgEl = document.getElementById("location-organization")
-  if (orgEl) orgEl.textContent = facility.organizationName
 
   const addressEl = document.getElementById("location-address")
-  if (addressEl) addressEl.textContent = facility.locationAddress || "住所情報なし"
+  if (addressEl) addressEl.textContent = `${facility.organizationName} ${facility.locationAddress} `
 
   const timeEl = document.getElementById("facility-time-text")
   if (timeEl) timeEl.textContent = facility.availableDays || "利用時間情報は登録されていません"
@@ -118,6 +115,17 @@ function updateNextLocationName(sortedFacilities: MapTools.FacilityDistance[]): 
 
   const secondFacility = sortedFacilities[1]?.facility
   nameEl.textContent = secondFacility ? secondFacility.locationName : "他の候補はありません"
+}
+
+function setupGuidanceButton(facility: AEDFacility): void {
+  const button = document.querySelector<HTMLButtonElement>('.guidance-button')
+  if (!button) return
+
+  button.onclick = () => {
+    // Google Mapsへのルート案内URL (徒歩モード)
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${facility.latitude},${facility.longitude}&travelmode=walking`
+    window.open(url, '_blank')
+  }
 }
 
 // アプリケーション起動
