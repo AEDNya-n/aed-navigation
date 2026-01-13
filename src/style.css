@@ -331,26 +331,26 @@ body {
 .footer-actions {
     display: flex;
     width: 100%;
-    height: auto;
-    min-height: 70px;
+    min-height: 60px;
     flex-shrink: 0;
     padding-bottom: env(safe-area-inset-bottom);
     background-color: #3DA73D; /* 背景色を追加してセーフエリアも同じ色にする */
 }
 
+/* ボタン内の設定 */
 .action-btn {
     flex: 1;
-    background-color: #3DA73D;
-    color: white;
+    background-color: #ECEBEB;
+    color: #4A4A4A;
     border: none;
-    border-right: 1px solid #388E3C;
-    font-size: 16px;
+    border-right: 1px solid #dcdcdc;
+    font-size: 14px;
     font-weight: bold;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     cursor: pointer;
     padding: 10px 0; /* 上下のパディングを追加 */
 }
@@ -359,19 +359,58 @@ body {
     border-right: none;
 }
 
-.action-btn i {
-    font-size: 32px;
+.action-btn .iconify {
+    font-size: var(--footer-icon-size);
+    width: var(--footer-icon-size);
+    height: var(--footer-icon-size);
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.action-btn.active {
+    color: #3DA73D;
+}
+
+/* iPhone SE 用*/
+@media screen and (max-height: 700px) {
+    
+    .footer-actions {
+        min-height: 50px;
+    }
+
+    .action-btn {
+        font-size: 24px;
+        gap: 3px;
+    }
+
+    .map-container {
+        min-height: 200px; 
+    }
 }
 
 /* レスポンシブ調整: 小さい画面対応 */
 @media (max-height: 700px) {
-    .map-container {
-        min-height: 0; /* フレキシブルに縮小可能にする */
-        flex-basis: 45%; /* 小さい画面では地図の割合を指定 */
+    .footer-actions {
+        min-height: 50px;
     }
-    
+
+    .action-btn {
+        font-size: 12px;
+        gap: 3px;
+    }
+
+    .action-btn .iconify {
+        font-size: var(--footer-icon-size);
+        width: var(--footer-icon-size);
+        height: var(--footer-icon-size);
+    }
+
+    .map-container {
+        min-height: 0;
+        flex-basis: 45%;
+    }
+
     .info-section {
-        padding: 12px 15px; /* 余白を削減 */
         max-height: 55vh;
     }
 
@@ -387,17 +426,8 @@ body {
         font-size: 18px;
         margin-bottom: 2px;
     }
+}
 
-    .footer-actions {
-        min-height: 60px;
-    }
-    
-    .action-btn i {
-        font-size: 24px;
-    }
-    
-    .action-btn {
-        font-size: 12px;
-        gap: 4px;
-    }
+:root {
+    --footer-icon-size: 28px;
 }
