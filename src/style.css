@@ -13,7 +13,7 @@ html {
 
 body {
     font-family: "BIZ UDGothic", "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-    background-color: #fff;
+    background-color: #f0f2f5;
     color: #333;
     display: flex;
     flex-direction: column;
@@ -21,6 +21,7 @@ body {
     height: 100dvh;
     width: 100%;
     overflow: hidden;
+    align-items: center; /* PC表示時に中央寄せ */
 }
 
 #app {
@@ -29,14 +30,17 @@ body {
     height: 100vh;
     height: 100dvh;
     overflow: hidden;
+    width: 100%;
+    max-width: 500px; /* PC表示時のスマホサイズ制限 */
+    background-color: white;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
 }
 
 .main-content {
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden; /* 全体スクロールを防止し、一画面に収める */
     background-color: white;
 }
 
@@ -204,7 +208,7 @@ body {
 }
 
 .location-info .location-name {
-    font-size: 18px;
+    font-size: 16px; /* 18pxから縮小 */
     font-weight: 600;
 }
 
@@ -221,6 +225,8 @@ body {
     flex-shrink: 0;
     box-shadow: 0 8px 24px rgba(0,0,0,0.08);
     border-radius: 18px 18px 0 0;
+    overflow-y: auto;
+    max-height: 45vh; /* 下半分くらいに収める */
 }
 
 .info-row {
@@ -228,7 +234,7 @@ body {
 }
 
 .info-row h2 {
-    font-size: 13px;
+    font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.08em;
     color: #5f6368;
@@ -237,13 +243,13 @@ body {
 }
 
 .time-text {
-    font-size: 24px;
+    font-size: 14px; /* 24pxから縮小 */
     font-weight: bold;
     color: #000;
 }
 
 .supplement-text {
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.6;
     color: #202124;
 }
@@ -260,6 +266,12 @@ body {
 .coordinates {
     font-size: 13px;
     line-height: 1.4;
+}
+
+.address {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* 119番通報画面用 */
@@ -349,4 +361,43 @@ body {
 
 .action-btn i {
     font-size: 32px;
+}
+
+/* レスポンシブ調整: 小さい画面対応 */
+@media (max-height: 700px) {
+    .map-container {
+        min-height: 0; /* フレキシブルに縮小可能にする */
+        flex-basis: 45%; /* 小さい画面では地図の割合を指定 */
+    }
+    
+    .info-section {
+        padding: 12px 15px; /* 余白を削減 */
+        max-height: 55vh;
+    }
+
+    .info-row {
+        margin-bottom: 3px;
+    }
+
+    .header {
+        padding: 12px 15px;
+    }
+
+    .header h1 {
+        font-size: 18px;
+        margin-bottom: 2px;
+    }
+
+    .footer-actions {
+        min-height: 60px;
+    }
+    
+    .action-btn i {
+        font-size: 24px;
+    }
+    
+    .action-btn {
+        font-size: 12px;
+        gap: 4px;
+    }
 }
