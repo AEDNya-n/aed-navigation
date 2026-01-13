@@ -63,11 +63,17 @@ async function renderApp(): Promise<void> {
 
     <footer class="footer-actions">
       <button class="action-btn">
-        <i class="fa-solid fa-phone-volume"></i>
+        <span class="iconify" data-icon="lucide:phone-call"></span>
         <span>救急連絡</span>
       </button>
+
+      <button class="action-btn active">
+        <span class="iconify" data-icon="material-symbols:map-outline-sharp"></span>
+        <span>最短地図</span>
+      </button>
+
       <button class="action-btn">
-        <i class="fa-solid fa-kit-medical"></i>
+        <span class="iconify" data-icon="material-symbols:medical-services-outline-rounded"></span>
         <span>応急処置</span>
       </button>
     </footer>
