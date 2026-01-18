@@ -270,6 +270,10 @@ body {
     cursor: default;
 }
 
+.adjacent-container {
+    width: 100%;
+}
+
 /*AEDの情報部分*/
 .info-section {
     padding: 18px;

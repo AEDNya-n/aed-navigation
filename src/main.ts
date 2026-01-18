@@ -41,14 +41,16 @@ async function renderApp(): Promise<void> {
           <i class="fa-solid fa-chevron-left"></i>
         </button>
         <div class="location-info">
-          <p class="label">表示中の地点</p>
-          <p class="location-name" id="current-location-name">検索中…</p>
           <p class="adjacent-names">
-            <span class="adjacent-label">前:</span>
-            <span id="prev-location-name">なし</span>
+            <span class="adjacent-container">
+              <span class="adjacent-label">前:</span>
+              <span id="prev-location-name">なし</span>
+            </span>
             <span class="adjacent-separator">|</span>
-            <span class="adjacent-label">次:</span>
-            <span id="next-location-name">検索中…</span>
+            <span class="adjacent-container">
+              <span class="adjacent-label">次:</span>
+              <span id="next-location-name">検索中…</span>
+            </span>
           </p>
         </div>
         <button class="location-nav-button next" aria-label="次の候補">
@@ -139,7 +141,6 @@ function applyFacilitySelection(options?: { skipMapUpdate?: boolean }): void {
   });
 
   updateNearestFacilityDetails(facility);
-  updateCurrentLocationName(facility.locationName);
   updateAdjacentLocationNames();
   setupGuidanceButton(facility);
   updateNavigationControls();
@@ -182,10 +183,6 @@ function updateNearestFacilityDetails(facility: AEDFacility): void {
   }
 }
 
-function updateCurrentLocationName(name: string | undefined): void {
-  const nameEl = document.getElementById("current-location-name");
-  if (nameEl) nameEl.textContent = name ?? "名称不明";
-}
 
 function updateAdjacentLocationNames(): void {
   const prevNameEl = document.getElementById("prev-location-name");
