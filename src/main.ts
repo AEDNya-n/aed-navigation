@@ -6,6 +6,7 @@ import type { AEDFacility } from './filter';
 import * as MapTools from "./mapTools.ts"
 import "./libs/leaflet.usermarker.css"
 import "leaflet/dist/leaflet.css"
+import * as holiday_jp from '@holiday-jp/holiday_jp';
 
 async function renderApp(): Promise<void> {
   const app = document.querySelector<HTMLDivElement>('#app')
@@ -59,6 +60,11 @@ async function renderApp(): Promise<void> {
       </div>
 
       <div class="info-section">
+        <div class="info-row"> 
+          <h2>利用可能日</h2>
+          <p class="date-text" id="facility-date-text">読み込み中…</p>
+        </div>
+        <hr class="divider">
         <div class="info-row">
           <h2>利用可能時間</h2>
           <p class="time-text" id="facility-time-text">読み込み中…</p>
@@ -66,7 +72,7 @@ async function renderApp(): Promise<void> {
         <hr class="divider">
         <div class="info-row">
           <h2>補足</h2>
-          <p class="supplement-text" id="facility-notes">情報を取得しています。</p>
+          <p class="supplement-text" id="facility-notes">読み込み中…</p>
         </div>
       </div>
     </main>
@@ -174,8 +180,41 @@ function updateNearestFacilityDetails(facility: AEDFacility): void {
   const addressEl = document.getElementById("location-address")
   if (addressEl) addressEl.textContent = `${facility.organizationName} ${facility.locationAddress} `
 
+  const dateEl = document.getElementById("facility-date-text")
+  if (dateEl) dateEl.textContent = facility.availableDays || "利用可能日情報は登録されていません"
+
   const timeEl = document.getElementById("facility-time-text")
-  if (timeEl) timeEl.textContent = facility.availableDays || "利用時間情報は登録されていません"
+  if (timeEl) {
+    const days = [
+      { start: facility.mondayAvailableStartTime, end: facility.mondayAvailableEndTime },
+      { start: facility.tuesdayAvailableStartTime, end: facility.tuesdayAvailableEndTime },
+      { start: facility.wednesdayAvailableStartTime, end: facility.wednesdayAvailableEndTime },
+      { start: facility.thursdayAvailableStartTime, end: facility.thursdayAvailableEndTime },
+      { start: facility.fridayAvailableStartTime, end: facility.fridayAvailableEndTime },
+      { start: facility.saturdayAvailableStartTime, end: facility.saturdayAvailableEndTime },
+      { start: facility.sundayAvailableStartTime, end: facility.sundayAvailableEndTime },
+      { start: facility.holidayAvailableStartTime, end: facility.holidayAvailableEndTime },
+    ]
+    
+    const today = new Date();
+    const isHoliday = holiday_jp.isHoliday(today);
+    console.log(`今日は${isHoliday ? '' : '平日'}です`);
+    // 祝日で祝日の時刻が設定されていれば祝日用の時刻を優先、それ以外は曜日ごとの時刻を使用
+    let timeText: string;
+    if (isHoliday && facility.holidayAvailableStartTime && facility.holidayAvailableEndTime) {
+      timeText = `祝日: ${facility.holidayAvailableStartTime} ～ ${facility.holidayAvailableEndTime}`;
+    } else {
+      const dayIndex = today.getDay(); // 0:日曜, 1:月曜, ..., 6:土曜
+      const dayTime = days[dayIndex];
+      if (dayTime.start && dayTime.end) {
+        const dayNames = ["日曜", "月曜", "火曜", "水曜", "木曜", "金曜", "土曜"];
+        timeText = `${dayNames[dayIndex]}: ${dayTime.start} ～ ${dayTime.end}`;
+      } else {
+        timeText = "本日の利用時間情報は登録されていません";
+      }
+    }
+    timeEl.textContent = timeText;
+  }
 
   const notesEl = document.getElementById("facility-notes")
   if (notesEl) {
